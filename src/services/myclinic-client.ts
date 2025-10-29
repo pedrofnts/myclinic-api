@@ -484,6 +484,23 @@ export class MyclinicClient {
     }
 
     try {
+      // Primeiro, fazer um GET na página do relatório para extrair o CSRF token correto
+      try {
+        const pageResponse = await this.client.get('/report/customers_birthdays', {
+          headers: {
+            'Cookie': `bemp-session=${this.sessionCookie}`,
+          }
+        });
+
+        // Extrair CSRF token da página do relatório
+        const csrfToken = this.extractAuthenticityToken(pageResponse.data);
+        if (csrfToken) {
+          this.authenticityToken = csrfToken;
+        }
+      } catch (error) {
+        console.error('Erro ao carregar página do relatório:', error);
+      }
+
       // Montar o body do form
       const formData = new URLSearchParams({
         'authenticity_token': this.authenticityToken || '',
@@ -501,6 +518,11 @@ export class MyclinicClient {
           'Accept': 'text/vnd.turbo-stream.html, text/html, application/xhtml+xml',
           'Turbo-Frame': 'report',
           'X-Turbo-Request-Id': this.generateRequestId(),
+          'Origin': this.baseURL,
+          'Referer': `${this.baseURL}/report/customers_birthdays`,
+          'Sec-Fetch-Site': 'same-origin',
+          'Sec-Fetch-Mode': 'cors',
+          'Sec-Fetch-Dest': 'empty',
         }
       });
 
