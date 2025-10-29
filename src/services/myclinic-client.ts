@@ -440,8 +440,8 @@ export class MyclinicClient {
       const nameMatch = row.match(/<a[^>]*>([^<]+)<\/a>/);
       const nome = nameMatch ? nameMatch[1].trim() : '';
 
-      // Extrair telefone (texto antes do <a> do whatsapp)
-      const phoneMatch = row.match(/<td[^>]*>([+\d\s()-]+)<a[^>]*fab fa-whatsapp/);
+      // Extrair telefone (texto antes do <a>)
+      const phoneMatch = row.match(/<td[^>]*>([+\d\s()-]+)\s*<a/);
       let telefone = phoneMatch ? phoneMatch[1].trim() : '';
 
       // Remover caracteres não numéricos do telefone
